@@ -5,7 +5,7 @@
 - untuk start, restart, stop service menggunakan "sudo systemctl start/restart/stop payPDL-api.service"
 - untuk melihat logs pakai "journalctl -u payPDL-api.service"
 - pakai curl :
-  curl -X POST -H "Content-type: application/json" \                                                                                                                       ✔  17s 
+  curl -X POST -H "Content-type: application/json" \                                                                     
 -d '{"Nop":"3512aaabbbcccdddde",
         "Masapajak":"20xx",
         "DateTime":"2020-08-25 14:11:05",
