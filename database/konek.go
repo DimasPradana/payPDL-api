@@ -29,8 +29,6 @@ func KonekOracle(username, pwd, host, port, sn string) (*sql.DB, error) {
 		logrus.Fatalf("koneksi error bosku: %v", err)
 		// logrus.Infof("koneksi error bosku: %v", err)
 		db.Close()
-	} else {
-		// logrus.Info("koneksi OK bosku")
 	}
 	return db, nil
 }
