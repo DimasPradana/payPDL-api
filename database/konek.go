@@ -22,7 +22,8 @@ func KonekMysql(host, username, pwd, port, dbname string) (*sql.DB, error) { // 
 }
 
 func KonekOracle(username, pwd, host, port, sn string) (*sql.DB, error) {
-	connString := fmt.Sprintf("%v/%v@%v:%v/%v", username, pwd, host, port, sn)
+	// connString := fmt.Sprintf("%v/%v@%v:%v/%v", username, pwd, host, port, sn)
+	connString := fmt.Sprintf("%v/%v@%v:%v/%v?charset=utf8mb4&parseTime=True&loc=Asia/Jakarta", username, pwd, host, port, sn)
 	db, err := sql.Open("godror", connString)
 	// if err != nil {
 	if err = db.Ping(); err != nil {

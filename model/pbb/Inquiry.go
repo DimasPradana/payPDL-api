@@ -3,7 +3,8 @@ package model
 type StructReqInquiry struct {
 	NOP           string `json:"Nop"`
 	MASAPAJAK     string `json:"MasaPajak"`
-	DATETIME      string `json:"DateTime"`
+	// DATETIME      string `json:"DateTime" sql:"DEFAULT:current_timestamp"` // coba hilangkan warning
+	DATETIME      string `json:"DateTime"` // coba hilangkan warning
 	MERCHANT      string `json:"Merchant"`
 	KODEINSTITUSI string `json:"KodeInstitusi"`
 	NOHP          string `json:"NoHp"`

@@ -33,7 +33,8 @@ func Inquiry(c *gin.Context) {
 	/**
 	TODO snub on Jum 05 Jun 2021 00:30:24 :
 	- ketika gonta ganti NOP, Nama tetap tapi tagihan berubah ✓
-	- pembayaran denda tidak masuk sismiop → PEMBAYARAN_SPPT ✗
+	- pembayaran denda dan total salah tahun (kebalik) → PEMBAYARAN_SPPT ✗
+	- status lunas di inquiry belum (response code : 13) x
 	*/
 
 	/*
