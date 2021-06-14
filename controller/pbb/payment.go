@@ -111,6 +111,7 @@ func Payment(c *gin.Context) {
 		//logrus.Infof("isi pokok : %v, jatuhtempo : %v, denda : %v, total : %v", pokok, jatuhtempo, denda, total)
 	}
 	//logrus.Infof("isi arrpokok : %v, arrdenda : %v, total : %v", arrPokok, arrDenda, arrTotal)
+	defer rows.Close()
 
 	for b := range arrTotal {
 		subtotal += arrTotal[b]
@@ -225,6 +226,7 @@ func InsertPayment(kec, kel, blok, urut, kdjnsop, thn, kdtp1, kdtp2, kdtp3, kdtp
 	} else {
 		logrus.Infof("Insert pembayaran %v-%v-%v-%v-%v|%v SPO Sukses\nUpdate Payment Sukses", kec, kel, blok, urut, kdjnsop, thn)
 	}
+	defer kon.Close()
 
 	return queryInsertSPO
 }
@@ -254,6 +256,7 @@ func ambilKodeTP(kodeinstitusi string) model.KDTP {
 			logrus.Fatalf("errornya di baris 254 : %v", err.Error())
 		}
 	}
+	defer rows.Close()
 
 	//logrus.Infof("isi dari kodetp baris 258 : %v", kdtp)
 
@@ -265,6 +268,7 @@ func ambilKodeTP(kodeinstitusi string) model.KDTP {
 		kdtp.KD_TP = "04"
 		kdtp.KODE_INSTITUSI = "090909091"
 	}
+	defer kon.Close()
 
 	return kdtp
 }

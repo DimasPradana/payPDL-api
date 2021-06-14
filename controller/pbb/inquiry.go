@@ -123,6 +123,7 @@ func Inquiry(c *gin.Context) {
 		// logrus.Infof("isi dari scan\nNama : %v,\nTahun: %v\nTagihan: %v", arrNama[0].NAMA, tagihan.TAHUN, tagihan.POKOK)
 		// logrus.Infof("\narray nama : %v", arrNama)
 	}
+	defer rows.Close()
 	//logrus.Infof("isi dari scan\nNama : %v,\nPokok: %v\nDenda: %v\nTotal: %v", arrNama[0].NAMA, arrTagihan[2].POKOK, arrTagihan[2].DENDA, arrTagihan[2].TOTAL)
 
 	/*

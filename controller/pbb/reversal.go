@@ -85,6 +85,7 @@ func Reversal(c *gin.Context) {
 			} //}
 		}
 	}
+	defer rows.Close()
 
 	for a := range reqReversal.TAGIHAN {
 		thnpjk = append(thnpjk, reqReversal.TAGIHAN[a].TAHUN)
@@ -177,6 +178,9 @@ func UpdateReversal(kec, kel, blok, urut, thn string) string {
 	} else {
 		logrus.Infof("Reversal %v-%v-%v-%v|%v Sukses", kec, kel, blok, urut, thn)
 	}
+
+	defer kon.Close()
+
 
 	return queryDelSPO
 }
