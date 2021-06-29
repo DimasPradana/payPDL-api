@@ -59,9 +59,6 @@ func Inquiry(c *gin.Context) {
 	tahun := reqInquiry.MASAPAJAK
 	nop := kdKecamatan + "-" + kdKelurahan + "-" + kdBlok + "-" + noUrut + "-" + kdJnsOp
 
-	//statusLns := cekLunas(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, tahun)
-	//logrus.Infof("baris 63 isi dari statusLns: %v", statusLns)
-
 	/*
 		TODO snub on Sab 04 Jul 2020 11:11:16  : query ke database masuk variabel
 	*/
@@ -97,12 +94,13 @@ func Inquiry(c *gin.Context) {
 		TODO snub on Sab 04 Jul 2020 11:11:48  : konek pake env file
 	*/
 	kon, _ := database.KonekOracle(envUser, envPass, envAddr, envPort, envSN)
-	// logrus.Infof("kon : %v", kon)
 	logrus.Infof("row 95 inquiry request nop : %v", nop)
 
 	statusSPPT = cekSPPT(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, tahun)
 
 	if statusSPPT != 0 {
+		statusLunas = cekLunas(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, tahun)
+
 		rows, err := kon.Query(qryFix)
 		if err != nil {
 			logrus.Infof("errornya di baris 99 : %v,", qryFix)
@@ -111,7 +109,6 @@ func Inquiry(c *gin.Context) {
 		}
 
 		for rows.Next() {
-			//if err != rows.Scan(&tagihan.TAHUN, &tagihan.POKOK, &tagihan.JATUHTEMPO, &nama.NAMA, &tagihan.LUNAS, &nama.KELURAHAN) {
 			if err != rows.Scan(&tagihan.TAHUN, &tagihan.POKOK, &jatuhtempo, &nama.NAMA, &lunas, &nama.KELURAHAN) {
 				http.Error(c.Writer, err.Error(), 500)
 				return
@@ -124,31 +121,22 @@ func Inquiry(c *gin.Context) {
 				return
 			}
 
-			statusLunas = cekLunas(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, tahun)
-
 			tagihan.DENDA = uint64(ambilDenda(_t, tagihan.POKOK))
 			tagihan.TOTAL = tagihan.POKOK + tagihan.DENDA
 
 			arrTagihan = append(arrTagihan, tagihan)
 			arrNama = append(arrNama, nama)
 			arrLunas = append(arrLunas, lunas)
-			//logrus.Infof("isi dari scan\nNama : %v,\nTahun: %v\nTagihan: %v\nlunas :%v", arrNama[0].NAMA, tagihan.TAHUN, tagihan.POKOK, lunas[0])
-			//logrus.Infof("\narray nama : %v, tahun : %v,lunas : %v", nama.NAMA, tagihan.TAHUN, lunas)
+
 		}
 		defer rows.Close()
+
 	}
 
-	//logrus.Infof("status lunas tahun berjalan : %v, DOP : %v", statusLunas, statusSPPT)
-
-	/*logrus.Infof("isi dari scan\nNama : %v,\nPokok: %v\nDenda: %v\nTotal: %v\ntahun : %v\nlunas : %v", arrNama[0].NAMA,
-	arrTagihan[0].POKOK, arrTagihan[0].DENDA, arrTagihan[0].TOTAL, arrTagihan[0].TAHUN, arrLunas[0])
-	*/
 	/*
 		TODO snub on Sab 04 Jul 2020 11:13:59  : inisialisasi respon body
 	*/
 	switch {
-	//case arrNama[0].NAMA == "":
-	//case arrNama == nil:
 	case statusSPPT == 0:
 		{
 			InqError.ISERROR = "True"
@@ -158,8 +146,7 @@ func Inquiry(c *gin.Context) {
 			arrTagihan, arrNama, arrLunas = nil, nil, nil
 			c.JSON(http.StatusOK, InqStatusError)
 		}
-	//case lunas[0] == 49:
-	//case arrLunas[0] == 1:
+
 	case statusLunas == 1&statusSPPT == true:
 		{
 			InqError.ISERROR = "True"
@@ -207,7 +194,6 @@ func ambilDenda(jatuhtempo time.Time, pokok uint64) float64 {
 }
 
 func cekLunas(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, tahun string) byte {
-	//var statusLunas byte
 	qry := fmt.Sprintf("select a.STATUS_PEMBAYARAN_SPPT "+
 		"from SPPT a "+
 		"where a.KD_KECAMATAN='%v' "+
@@ -242,7 +228,6 @@ func cekLunas(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, tahun string) b
 }
 
 func cekSPPT(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, tahun string) byte {
-	//var statusDOP byte
 	qry := fmt.Sprintf("select count(a.KD_PROPINSI) "+
 		"from SPPT a "+
 		"where a.KD_KECAMATAN='%v' "+
