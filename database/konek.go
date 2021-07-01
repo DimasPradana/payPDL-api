@@ -40,8 +40,6 @@ func KonekBphtb(host, username, pwd, port, dbname string) (*sql.DB, error) {
 	if err = db.Ping(); err != nil {
 		logrus.Fatalf("koneksi error bosku: %v", err)
 		db.Close()
-	} else {
-		logrus.Info("koneksi OK bosku")
 	}
 	return db, nil
 }
