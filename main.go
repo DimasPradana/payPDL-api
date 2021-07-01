@@ -5,6 +5,7 @@ import (
 
 	"github.com/DimasPradana/kantor/payPDL-api/controller"
 	"github.com/gin-gonic/gin"
+	controllerbphtb "github.com/DimasPradana/kantor/payPDL-api/controller/bphtb"
 	// "io"
 	controllerpbb "github.com/DimasPradana/kantor/payPDL-api/controller/pbb"
 	// "os"
@@ -36,5 +37,9 @@ func main() {
 	router.POST("/inquiry", controllerpbb.Inquiry)
 	router.POST("/payment", controllerpbb.Payment)
 	router.POST("/reversal", controllerpbb.Reversal)
+	bphtbRoutes := router.Group("/bphtb")
+	{
+		bphtbRoutes.GET("/cekprogresif/:noidentitasth", controllerbphtb.CekProgresif)
+	}
 	router.Run(":8002")
 }

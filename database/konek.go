@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/godror/godror"
 	"github.com/sirupsen/logrus"
 )
 
 func KonekMysql(host, username, pwd, port, dbname string) (*sql.DB, error) { // epajak
-	connString := fmt.Sprintf("%v:%v@(%v:%v)/%v", username, pwd, host, port, dbname)
+	connString := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", username, pwd, host, port, dbname)
 	db, err := sql.Open("mysql", connString)
 	// TODO check if error
 	if err = db.Ping(); err != nil {
