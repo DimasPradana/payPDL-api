@@ -15,8 +15,6 @@ func KonekMysql(host, username, pwd, port, dbname string) (*sql.DB, error) { // 
 	if err = db.Ping(); err != nil {
 		logrus.Fatalf("koneksi error bosku: %v", err)
 		db.Close()
-	} else {
-		logrus.Info("koneksi OK bosku")
 	}
 	return db, nil
 }
@@ -25,6 +23,7 @@ func KonekOracle(username, pwd, host, port, sn string) (*sql.DB, error) {
 	connString := fmt.Sprintf("%v/%v@%v:%v/%v", username, pwd, host, port, sn)
 	//connString := fmt.Sprintf("%v/%v@%v:%v/%v?charset=utf8mb4&parseTime=True&loc=Asia/Jakarta", username, pwd, host, port, sn)
 	db, err := sql.Open("godror", connString)
+	// db.SetMaxOpenConns(20) //  TODO snub on Wed 30 Jun 2021 11:17:55 : limit opened connections //
 	// if err != nil {
 	if err = db.Ping(); err != nil {
 		logrus.Fatalf("koneksi error bosku: %v", err)
