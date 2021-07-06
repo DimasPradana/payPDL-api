@@ -28,7 +28,7 @@ var denda float64
 var lunas, statusLunas, statusSPPT byte
 
 var arrLunas []byte
-var jatuhtempo string
+    var jatuhtempo string
 
 func Inquiry(c *gin.Context) {
 
@@ -147,7 +147,7 @@ func Inquiry(c *gin.Context) {
 			c.JSON(http.StatusOK, InqStatusError)
 		}
 
-	case statusLunas == 1 & statusSPPT == true:
+	case statusLunas == 1&statusSPPT == true:
 		{
 			InqError.ISERROR = "True"
 			InqError.RESPONSECODE = "13"

@@ -18,12 +18,9 @@ import (
 func Payment(c *gin.Context) {
 
 	/*
-		TODO snub on Rab 19 Agu 2020 11:27:22  :
-		- kode institusi dan kode stan belum dapat dari mas viki
-		- flag_kirim, tgl_rev, tgl_trx, reference belum tau artinya
-		- kalo kode reversal = 1 gimana jadi nya di table pembayaran?
-		- kalo sudah ada pembayaran yang direversal, jangan insert, tapi update
-		- jangan insert ke SPO, tapi ke table pembayaran
+		TODO snub on Sel 6 Juli Agu 2021 22:16:22  :
+        - cek status lunas dan count di table bayar dulu sebelum payment ✗
+        - jika status lunas dan count lebih dari 1 then beri respon lunas ✗
 	*/
 
 	var reqPayment model.StructReqPayment
@@ -38,7 +35,8 @@ func Payment(c *gin.Context) {
 	var pokok, total, subtotal uint64
 	var jatuhtempo string
 	var denda float64
-	var arrPokok, arrDenda, arrTotal []uint64
+	// var arrPokok, arrDenda, arrTotal []uint64
+	var arrDenda, arrTotal []uint64
 
 	err := json.NewDecoder(c.Request.Body).Decode(&reqPayment)
 	if err != nil {
@@ -105,7 +103,7 @@ func Payment(c *gin.Context) {
 		denda = ambilDenda(_t, pokok)
 		total = pokok + uint64(denda)
 
-		arrPokok = append(arrPokok, pokok)
+		// arrPokok = append(arrPokok, pokok)
 		arrDenda = append(arrDenda, uint64(denda))
 		arrTotal = append(arrTotal, total)
 		//logrus.Infof("isi pokok : %v, jatuhtempo : %v, denda : %v, total : %v", pokok, jatuhtempo, denda, total)
