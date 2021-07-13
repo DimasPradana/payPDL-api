@@ -17,8 +17,8 @@ func main() {
 			- log file belum pake logrus
 	*/
 	runtime.GOMAXPROCS(4) //jumlah maksimal prosesor yang digunakan
-	gin.SetMode(gin.ReleaseMode)
-	// gin.SetMode(gin.DebugMode)
+	// gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 	// Force log's color
 	// gin.ForceConsoleColor()
 	// Disable Console Color, you don't need console color when writing the logs to file.
@@ -34,6 +34,7 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/testing", controller.Testing)
+    router.GET("/pelayanan/:nop", controllerpbb.Pelayanan)
 	router.POST("/inquiry", controllerpbb.Inquiry)
 	router.POST("/payment", controllerpbb.Payment)
 	router.POST("/reversal", controllerpbb.Reversal)

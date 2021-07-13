@@ -1,8 +1,8 @@
 package model
 
 type StructReqInquiry struct {
-	NOP           string `json:"Nop"`
-	MASAPAJAK     string `json:"MasaPajak"`
+	NOP       string `json:"Nop"`
+	MASAPAJAK string `json:"MasaPajak"`
 	// DATETIME      string `json:"DateTime" sql:"DEFAULT:current_timestamp"` // coba hilangkan warning
 	DATETIME      string `json:"DateTime"` // coba hilangkan warning
 	MERCHANT      string `json:"Merchant"`
@@ -21,6 +21,22 @@ type StructResInquiry struct {
 	EMAIL         string       `json:"Email"`
 	TAGIHAN       []InqTagihan `json:"Tagihan"`
 	STATUS        InqStatus    `json:"Status"`
+}
+
+type StructResPelayanan struct {
+	NAMA      string `json:"Nama"`
+	TAHUN     string `json:"Tahun"`
+	POKOK     string `json:"Pokok"`
+	DENDA     string `json:"Denda"`
+	TOTAL     string `json:"Total"`
+	LUASINDUK string `json:"LuasInduk"`
+	KODE      string `json:"Kode"`
+	ALAMATWP  string `json:"AlamatWP"`
+	STATUS    string `json:"Status"`
+	LUNAS    string `json:"Lunas"`
+	NJOPBUMI    string `json:"NjopBumi"`
+	NJOPBNG    string `json:"NjopBng"`
+	TANGGALBAYAR    string `json:"TanggalBayar"`
 }
 
 type InqTagihan struct {

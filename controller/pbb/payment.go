@@ -18,9 +18,9 @@ import (
 func Payment(c *gin.Context) {
 
 	/*
-		TODO snub on Sel 6 Juli Agu 2021 22:16:22  :
-        - cek status lunas dan count di table bayar dulu sebelum payment ✗
-        - jika status lunas dan count lebih dari 1 then beri respon lunas ✗
+				TODO snub on Sel 6 Juli Agu 2021 22:16:22  :
+		        - cek status lunas dan count di table bayar dulu sebelum payment ✗
+		        - jika status lunas dan count lebih dari 1 then beri respon lunas ✗
 	*/
 
 	var reqPayment model.StructReqPayment
@@ -35,8 +35,8 @@ func Payment(c *gin.Context) {
 	var pokok, total, subtotal uint64
 	var jatuhtempo string
 	var denda float64
-	// var arrPokok, arrDenda, arrTotal []uint64
 	var arrDenda, arrTotal []uint64
+	var arrStatusLunas []byte
 
 	err := json.NewDecoder(c.Request.Body).Decode(&reqPayment)
 	if err != nil {
@@ -72,7 +72,6 @@ func Payment(c *gin.Context) {
 	for a := range reqPayment.TAGIHAN {
 		thnpjk = append(thnpjk, reqPayment.TAGIHAN[a].TAHUN)
 		thnpjkjoin = strings.Join(thnpjk, ",")
-		//logrus.Infof("reqPayment tagihan : %v", thnpjkjoin)
 	}
 
 	qryFix := fmt.Sprintf("select a.PBB_YG_HARUS_DIBAYAR_SPPT as pokok, a.TGL_JATUH_TEMPO_SPPT as jatuhtempo "+
@@ -103,24 +102,18 @@ func Payment(c *gin.Context) {
 		denda = ambilDenda(_t, pokok)
 		total = pokok + uint64(denda)
 
-		// arrPokok = append(arrPokok, pokok)
 		arrDenda = append(arrDenda, uint64(denda))
 		arrTotal = append(arrTotal, total)
-		//logrus.Infof("isi pokok : %v, jatuhtempo : %v, denda : %v, total : %v", pokok, jatuhtempo, denda, total)
 	}
-	//logrus.Infof("isi arrpokok : %v, arrdenda : %v, total : %v", arrPokok, arrDenda, arrTotal)
 	defer rows.Close()
 
 	for b := range arrTotal {
 		subtotal += arrTotal[b]
-		//logrus.Infof("total : %v", arrTotal[b])
 	}
-	//logrus.Infof("subtotal : %v", subtotal)
 
 	switch {
 	case arrTotal == nil:
 		{
-			//logrus.Infof("Tagihan Nihil")
 			PayError.ISERROR = "True"
 			PayError.RESPONSECODE = "23"
 			PayError.ERRORDESC = "Jumlah Pembayaran Nihil"
@@ -138,26 +131,36 @@ func Payment(c *gin.Context) {
 		}
 	default:
 		{
-			kodetp := ambilKodeTP(reqPayment.KODEINSTITUSI)
-			//logrus.Infof("isi dari kodetp baris 143 : %v, kodebanktunggal : %v", kodetp, kodetp.KD_BANK_TUNGGAL)
-			//for i := range thnpjk {
-			//	InsertPayment(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, thnpjk[i], kodetp.KD_KANWIL,
-			//		kodetp.KD_KPPBB, kodetp.KD_BANK_TUNGGAL, kodetp.KD_BANK_PERSEPSI, kodetp.KD_TP,
-			//		reqPayment.DATETIME, strings.Join(formatKodepengesahan, ""), reqPayment.KODEINSTITUSI, arrDenda[i], arrTotal[i])
-			//}
 			for i := range thnpjk {
-				InsertPayment(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, thnpjk[i], kodetp.KD_KANWIL,
-					kodetp.KD_KPPBB, kodetp.KD_BANK_TUNGGAL, kodetp.KD_BANK_PERSEPSI, kodetp.KD_TP,
-					reqPayment.DATETIME, strings.Join(formatKodepengesahan, ""), kodetp.KODE_INSTITUSI, arrDenda[i], arrTotal[i])
+				statusLunas := cekLunas(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, thnpjk[i])
+				if statusLunas == 1 {
+					arrStatusLunas = append(arrStatusLunas, statusLunas)
+				} else {
+					kodetp := ambilKodeTP(reqPayment.KODEINSTITUSI)
+					InsertPayment(kdKecamatan, kdKelurahan, kdBlok, noUrut, kdJnsOp, thnpjk[i], kodetp.KD_KANWIL,
+						kodetp.KD_KPPBB, kodetp.KD_BANK_TUNGGAL, kodetp.KD_BANK_PERSEPSI, kodetp.KD_TP,
+						reqPayment.DATETIME, strings.Join(formatKodepengesahan, ""), kodetp.KODE_INSTITUSI, arrDenda[i], arrTotal[i])
+				}
 			}
-			resPayment.NOP = reqPayment.NOP
-			resPayment.KODEPENGESAHAN = strings.Join(formatKodepengesahan, "")
-			resPayment.KODEKP = "0000"
-			status.ISERROR = "False"
-			status.RESPONSECODE = "00"
-			status.ERRORDESC = "Success"
-			resPayment.STATUS = status
-			c.JSON(http.StatusOK, resPayment)
+			if len(arrStatusLunas) == 0 {
+				resPayment.NOP = reqPayment.NOP
+				resPayment.KODEPENGESAHAN = strings.Join(formatKodepengesahan, "")
+				resPayment.KODEKP = "0000"
+				status.ISERROR = "False"
+				status.RESPONSECODE = "00"
+				status.ERRORDESC = "Success"
+				resPayment.STATUS = status
+				c.JSON(http.StatusOK, resPayment)
+			} else {
+				resPayment.NOP = reqPayment.NOP
+				resPayment.KODEPENGESAHAN = ""
+				resPayment.KODEKP = "0000"
+				status.ISERROR = "True"
+				status.RESPONSECODE = "13"
+				status.ERRORDESC = "Tagihan SPPT dengan Tahun Pajak dimaksud telah dibayar"
+				resPayment.STATUS = status
+				c.JSON(http.StatusOK, resPayment)
+			}
 		}
 	}
 
@@ -191,15 +194,6 @@ func InsertPayment(kec, kel, blok, urut, kdjnsop, thn, kdtp1, kdtp2, kdtp3, kdtp
 		"where KD_KECAMATAN = '%v' and KD_KELURAHAN = '%v' and KD_BLOK = '%v' "+
 		"and NO_URUT = '%v' and KD_JNS_OP = '%v' and THN_PAJAK_SPPT = '%v'", kdtp1, kdtp2, kdtp3, kdtp4, kdtp5, kodeinstitusi[0:9], kec, kel, blok, urut, kdjnsop, thn)
 
-	//qryInsertPay := fmt.Sprintf("INSERT INTO PBB.PEMBAYARAN_SPPT (KD_PROPINSI, KD_DATI2, KD_KECAMATAN, KD_KELURAHAN, "+
-	//	"KD_BLOK, NO_URUT, KD_JNS_OP, THN_PAJAK_SPPT, PEMBAYARAN_SPPT_KE, KD_KANWIL_BANK, KD_KPPBB_BANK, "+
-	//	"KD_BANK_TUNGGAL, KD_BANK_PERSEPSI, KD_TP, DENDA_SPPT, JML_SPPT_YG_DIBAYAR, TGL_PEMBAYARAN_SPPT, "+
-	//	"NIP_REKAM_BYR_SPPT, JENIS_BAYAR, PAJAK_POOL, CREA_USER, CREA_DATE, KETERANGAN) "+
-	//	"VALUES ('35', '12', '%v', '%v', "+
-	//	"'%v', '%v', '%v', '%v', 1, '%v', '%v', "+
-	//	"'%v', '%v', '%v', %v, %v, TO_DATE('%v', 'YYYY-MM-DD HH24:MI:SS'), "+
-	//	"'%v', null, 'N', null, null, %v)", kec, kel, blok, urut, kdjnsop, thn, kdtp1, kdtp2, kdtp3, kdtp4, kdtp5, den, total, reqTglBayar, kodeinstitusi[0:9], kodPeng)
-
 	config.Getenvfile()
 	envUser := os.Getenv("userpbb")
 	envPass := os.Getenv("password")
@@ -208,13 +202,6 @@ func InsertPayment(kec, kel, blok, urut, kdjnsop, thn, kdtp1, kdtp2, kdtp3, kdtp
 	envSN := os.Getenv("servicenamepbb")
 
 	kon, _ := database.KonekOracle(envUser, envPass, envAddr, envPort, envSN)
-
-	//hasilPay, err := kon.Exec(qryInsertPay)
-	//if err != nil {
-	//	logrus.Fatalf("errornya di baris 215: %v\n%v\nhasilnya: %v", err.Error(), qryInsertPay, hasilPay)
-	//} else {
-	//	logrus.Infof("Insert pembayaran sppt Sukses")
-	//}
 
 	hasilSPO, err := kon.Exec(queryInsertSPO)
 	hasilPay, err := kon.Exec(qryUpdatePay)
@@ -255,8 +242,6 @@ func ambilKodeTP(kodeinstitusi string) model.KDTP {
 		}
 	}
 	defer rows.Close()
-
-	//logrus.Infof("isi dari kodetp baris 258 : %v", kdtp)
 
 	if kdtp.KD_KANWIL == "" {
 		kdtp.KD_KANWIL = "12"
