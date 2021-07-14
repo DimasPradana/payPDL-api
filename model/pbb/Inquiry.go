@@ -24,19 +24,20 @@ type StructResInquiry struct {
 }
 
 type StructResPelayanan struct {
-	NAMA      string `json:"Nama"`
-	TAHUN     string `json:"Tahun"`
-	POKOK     string `json:"Pokok"`
-	DENDA     string `json:"Denda"`
-	TOTAL     string `json:"Total"`
-	LUASINDUK string `json:"LuasInduk"`
-	KODE      string `json:"Kode"`
-	ALAMATWP  string `json:"AlamatWP"`
-	STATUS    string `json:"Status"`
-	LUNAS    string `json:"Lunas"`
-	NJOPBUMI    string `json:"NjopBumi"`
-	NJOPBNG    string `json:"NjopBng"`
-	TANGGALBAYAR    string `json:"TanggalBayar"`
+	NAMA         string `json:"Nama"`
+	TAHUN        string `json:"Tahun"`
+	POKOK        uint64 `json:"Pokok"`
+	ALAMATWP     string `json:"AlamatWP"`
+	LUNAS        string `json:"Lunas"`
+	NJOPBUMI     uint64 `json:"NjopBumi"`
+	NJOPBNG      uint64 `json:"NjopBng"`
+	JATUHTEMPO   string `json:"Jatuhtempo"`
+	TANGGALBAYAR string `json:"TanggalBayar"`
+	LUASINDUK    int    `json:"LuasInduk"`
+	KODE         string `json:"Kode"`
+	DENDA        uint64 `json:"Denda"`
+	TOTAL        uint64 `json:"Total"`
+	//STATUS    string `json:"Status"`
 }
 
 type InqTagihan struct {

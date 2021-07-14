@@ -4,8 +4,9 @@ import (
 	"runtime"
 
 	"github.com/DimasPradana/kantor/payPDL-api/controller"
-	"github.com/gin-gonic/gin"
 	controllerbphtb "github.com/DimasPradana/kantor/payPDL-api/controller/bphtb"
+	"github.com/gin-gonic/gin"
+
 	// "io"
 	controllerpbb "github.com/DimasPradana/kantor/payPDL-api/controller/pbb"
 	// "os"
@@ -33,14 +34,20 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/testing", controller.Testing)
-    router.GET("/pelayanan/:nop", controllerpbb.Pelayanan)
-	router.POST("/inquiry", controllerpbb.Inquiry)
-	router.POST("/payment", controllerpbb.Payment)
-	router.POST("/reversal", controllerpbb.Reversal)
+	rootRoutes := router.Group("/")
+	{
+		rootRoutes.GET("testing", controller.Testing)
+		rootRoutes.POST("inquiry", controllerpbb.Inquiry)
+		rootRoutes.POST("payment", controllerpbb.Payment)
+		rootRoutes.POST("reversal", controllerpbb.Reversal)
+	}
 	bphtbRoutes := router.Group("/bphtb")
 	{
 		bphtbRoutes.GET("/cekprogresif/:noidentitasth", controllerbphtb.CekProgresif)
+	}
+	pbbRoutes := router.Group("/pbb")
+	{
+		pbbRoutes.GET("/pelayanan/:nop", controllerpbb.Pelayanan)
 	}
 	router.Run(":8002")
 }
