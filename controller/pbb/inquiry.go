@@ -3,35 +3,39 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/DimasPradana/kantor/payPDL-api/config"
-	"github.com/DimasPradana/kantor/payPDL-api/database"
-	"github.com/DimasPradana/kantor/payPDL-api/model/pbb"
 	"math"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/DimasPradana/kantor/payPDL-api/config"
+	"github.com/DimasPradana/kantor/payPDL-api/database"
+	"github.com/DimasPradana/kantor/payPDL-api/model/pbb"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
 
-var tagihan model.InqTagihan
-var arrTagihan []model.InqTagihan
-var reqInquiry model.StructReqInquiry
-var resInquiry model.StructResInquiry
-var status model.InqStatus
-var InqError model.InqError
-var InqStatusError model.InqStatusError
-var nama model.InqNama
-var arrNama []model.InqNama
-var denda float64
-var lunas, statusLunas, statusSPPT byte
+var (
+	tagihan                        model.InqTagihan
+	arrTagihan                     []model.InqTagihan
+	reqInquiry                     model.StructReqInquiry
+	resInquiry                     model.StructResInquiry
+	status                         model.InqStatus
+	InqError                       model.InqError
+	InqStatusError                 model.InqStatusError
+	nama                           model.InqNama
+	arrNama                        []model.InqNama
+	denda                          float64
+	lunas, statusLunas, statusSPPT byte
+)
 
-var arrLunas []byte
-    var jatuhtempo string
+var (
+	arrLunas   []byte
+	jatuhtempo string
+)
 
 func Inquiry(c *gin.Context) {
-
 	/**
 	TODO snub on Jum 05 Jun 2021 00:30:24 :
 	- ketika gonta ganti NOP, Nama tetap tapi tagihan berubah ✓
@@ -147,7 +151,8 @@ func Inquiry(c *gin.Context) {
 			c.JSON(http.StatusOK, InqStatusError)
 		}
 
-	case statusLunas == 1&statusSPPT == true:
+	// case statusLunas == 1&statusSPPT == true:
+	case statusLunas == 1&statusSPPT:
 		{
 			InqError.ISERROR = "True"
 			InqError.RESPONSECODE = "13"

@@ -10,8 +10,8 @@ import (
 )
 
 func CekProgresif(c *gin.Context) {
-	var countProgresif byte
-	var namaPembeli, identitasTH string
+	var countProgresif *byte
+	var namaPembeli, identitasTH *string
 	noidentitasth := c.Param("noidentitasth")
 
 	qry := fmt.Sprintf("select count(a.ID_PENGAJUAN), a.NAMA_TH, a.NO_IDENTITAS_TH "+
@@ -42,6 +42,7 @@ func CekProgresif(c *gin.Context) {
 	defer rows.Close()
 	defer kon.Close()
 
-	hasil := fmt.Sprintf("Nomor KTP '%v' dengan nama '%v' telah melakukan pembelian sebanyak : %v kali dalam tahun ini", identitasTH, namaPembeli, countProgresif)
+	hasil := fmt.Sprintf("Nomor KTP '%v' dengan nama '%v' telah melakukan pembelian sebanyak : %v kali dalam tahun ini", *identitasTH, *namaPembeli, *countProgresif)
 	c.JSON(http.StatusOK, hasil)
+    // identitasTH = ""; namaPembeli = ""; countProgresif = 0
 }
